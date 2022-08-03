@@ -9,7 +9,7 @@ require("ethers");
 require("@nomiclabs/hardhat-etherscan");
 // TEST
 require("chai");
-require("solidity-coverage");
+// require("solidity-coverage");
 // UTILS
 require("hardhat-gas-reporter");
 require("hardhat-contract-sizer");
@@ -33,7 +33,9 @@ function gwei(val) {
 const alchemyKey = process.env.ALCHEMY_API_KEY;
 const privateKey = process.env.NETWORK_PRIVATE_KEY || "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 const coinmarketcapKey = process.env.COINMARKETCAP_KEY;
+
 const etherscanKey = process.env.ETHERSCAN_KEY;
+const polygonscanKey = process.env.POLYGONSCAN_KEY;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // CONFIG
@@ -116,16 +118,15 @@ function gwei(val) {
 }
 
 async function mainnet_check() {
-  if (network.name !== "mainnet" && network.name !== "polygon")
-    return;
+  if (network.name !== "mainnet" && network.name !== "polygon") return;
 
   let rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   console.log("YOU ARE ON MAINNET!!!");
-  const okay = await rl.question("continue (y/n): ") === "y";
+  const okay = (await rl.question("continue (y/n): ")) === "y";
   if (!okay) {
     process.exit(1);
   }
@@ -133,6 +134,10 @@ async function mainnet_check() {
 
 async function logPreInfo(contractName, deployer, gp) {
   const addr = deployer.address;
+  if (addr === "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266") {
+    console.log("WARNING: deploying with dummy");
+  }
+
   const b1 = (await deployer.getBalance()).toString();
 
   let msg = "";
@@ -156,7 +161,7 @@ async function logPostInfo(deployer, contract, contractArgs) {
     verificationArgs += `${arg} `;
   }
 
-  console.log(`VerificationArgs:\n${verificationArgs}`);
+  console.log(`hh v --network ${network.name} ${verificationArgs}`);
 }
 
 function isEth() {
@@ -166,12 +171,18 @@ function isEth() {
     network.name === "kovan" ||
     network.name === "ropsten" ||
     network.name === "rinkeby" ||
-    network.name === "local"
+    network.name === "hardhat" ||
+    network.name === "localhost"
   );
 }
 
 function isPolygon() {
-  return network.name === "polygon" || network.name === "mumbai";
+  return (
+    network.name === "polygon" ||
+    network.name === "mumbai" ||
+    network.name === "hardhat" ||
+    network.name == "localhost"
+  );
 }
 
 function getPolygonChildManager() {
@@ -207,8 +218,6 @@ task("deploy", "deploys a smartcontract")
   .setAction(async (args, hre) => {
     const [deployer] = await ethers.getSigners();
     args.deployer = deployer;
-
-    assert(isEth());
 
     switch (args.c) {
       case "erc721": {
