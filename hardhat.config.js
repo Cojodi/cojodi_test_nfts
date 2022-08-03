@@ -44,11 +44,19 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 2000,
       },
     },
   },
+  mocha: {
+    timeout: 1000000000,
+  },
   networks: {
+    // ETHEREUM
+    mainnet: {
+      url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyKey}`,
+      accounts: [`${privateKey}`],
+    },
     ropsten: {
       url: `https://eth-ropsten.alchemyapi.io/v2/${alchemyKey}`,
       accounts: [`${privateKey}`],
@@ -57,29 +65,46 @@ module.exports = {
       url: `https://eth-rinkeby.alchemyapi.io/v2/${alchemyKey}`,
       accounts: [`${privateKey}`],
     },
-    mainnet: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyKey}`,
+    goerli: {
+      url: `https://eth-goerli.alchemyapi.io/v2/${alchemyKey}`,
       accounts: [`${privateKey}`],
     },
-    local: {
-      url: `http://127.0.0.1:8545`,
-      // hardhat account #0
-      accounts: ["0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"],
+    // POLYGON
+    polygon: {
+      url: "https://matic-mainnet.chainstacklabs.com",
+      accounts: [`${privateKey}`],
+    },
+    mumbai: {
+      // url: "https://rpc-mumbai.matic.today/",
+      url: "https://matic-mumbai.chainstacklabs.com",
+      accounts: [`${privateKey}`],
     },
   },
   gasReporter: {
     enabled: true,
     currency: "USD",
-    gasPrice: 40,
+    token: process.env.GASREPORTER_CURRENCY || "ETH",
+    gasPrice: 300,
     coinmarketcap: coinmarketcapKey,
   },
   contractSizer: {
     alphaSort: true,
     runOnCompile: false,
-    only: ["BlockAgentsMintpass"],
+    only: ["TheSquids", "TheSquidsTournament"],
   },
   etherscan: {
-    apiKey: etherscanKey,
+    apiKey: {
+      // ETHEREUM
+      mainnet: etherscanKey,
+      ropsten: etherscanKey,
+      rinkeby: etherscanKey,
+      goerli: etherscanKey,
+      kovan: etherscanKey,
+
+      // POLYGON
+      polygon: polygonscanKey,
+      polygonMumbai: polygonscanKey,
+    },
   },
 };
 
