@@ -1,0 +1,9 @@
+# temporary data
+**/artifacts/
+**/cache/
+**/coverage/
+**/node_modules/
+**/coverage.json
+
+**/contracts/@openzeppelin/*
+@openzeppelin
